@@ -1,0 +1,17 @@
+.layout {
+    width: 1200px;
+    margin: 0 auto;
+    margin-top: 30px;
+}
+
+.layout__button-home {
+    cursor: auto;
+}
+
+.layout__button-home_active {
+    cursor: pointer;
+}
+
+.layout-header {
+    margin-bottom: 30px;
+}
