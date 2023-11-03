@@ -5,6 +5,12 @@ body {
     font-style: normal;
 }
 
+.new-product-ref {
+    font-size: 20px;
+    height: 40px;
+    display: inline-block;
+}
+
 .container {
     padding: 20px 40px;
 }
@@ -135,4 +141,18 @@ body {
 
 .product-edit-footer {
     margin-top: 60px;
+}
+
+.product-similar-items {
+    display: flex;
+    flex-direction: column;
+    margin-left: 30px;
+    margin-top: 20px;
+}
+
+.product-similar {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    align-items: center;
 }

@@ -70,44 +70,51 @@ productsRouter.get('/search', async (
     }
 });
 
+
+const getProductByID = async (
+    id: string,
+    res: Response) => {
+    const [rows] = await connection.query<IProductEntity[]>(
+        "SELECT * FROM products WHERE product_id = ?",
+        [id]
+    );
+
+    if (!rows?.[0]) {
+        res.status(404);
+        res.send(`Product with id ${id} is not found`);
+        return;
+    }
+
+    const [comments] = await connection.query<ICommentEntity[]>(
+        "SELECT * FROM comments WHERE product_id = ?",
+        [id]
+    );
+
+    const [images] = await connection.query<IProductImageEntity[]>(
+        "SELECT * FROM images WHERE product_id = ?",
+        [id]
+    );
+
+    const product = mapProductsEntity(rows)[0];
+
+    if (comments.length) {
+        product.comments = mapCommentsEntity(comments);
+    }
+
+    if (images.length) {
+        product.images = mapImagesEntity(images);
+        product.thumbnail = product.images.find(image => image.main) || product.images[0];
+    }
+
+    res.send(product);
+}
+
 productsRouter.get('/:id', async (
     req: Request<{ id: string }>,
     res: Response
 ) => {
     try {
-        const [rows] = await connection.query<IProductEntity[]>(
-            "SELECT * FROM products WHERE product_id = ?",
-            [req.params.id]
-        );
-
-        if (!rows?.[0]) {
-            res.status(404);
-            res.send(`Product with id ${req.params.id} is not found`);
-            return;
-        }
-
-        const [comments] = await connection.query<ICommentEntity[]>(
-            "SELECT * FROM comments WHERE product_id = ?",
-            [req.params.id]
-        );
-
-        const [images] = await connection.query<IProductImageEntity[]>(
-            "SELECT * FROM images WHERE product_id = ?",
-            [req.params.id]
-        );
-
-        const product = mapProductsEntity(rows)[0];
-
-        if (comments.length) {
-            product.comments = mapCommentsEntity(comments);
-        }
-
-        if (images.length) {
-            product.images = mapImagesEntity(images);
-            product.thumbnail = product.images.find(image => image.main) || product.images[0];
-        }
-
-        res.send(product);
+        getProductByID(req.params.id, res);
     } catch (e) {
         throwServerError(res, e);
     }
@@ -118,6 +125,7 @@ productsRouter.post('/', async (
     res: Response
 ) => {
     try {
+        console.log("NEW PRODUCT?: " + JSON.stringify(req.body));
         const { title, description, price, images } = req.body;
         const productId = uuidv4();
         await connection.query<OkPacket>(
@@ -126,12 +134,12 @@ productsRouter.post('/', async (
         );
 
         if (images) {
+            console.log("ENTER?");
             const values = images.map((image) => [uuidv4(), image.url, productId, image.main]);
             await connection.query<OkPacket>(INSERT_PRODUCT_IMAGES_QUERY, [values]);
         }
 
-        res.status(201);
-        res.send(`Product id:${productId} has been added!`);
+        getProductByID(productId, res);
     } catch (e) {
         throwServerError(res, e);
     }
@@ -162,6 +170,11 @@ productsRouter.delete('/:id', async (
         await connection.query<OkPacket>(
             "DELETE FROM comments WHERE product_id = ?",
             [req.params.id]
+        );
+
+        await connection.query<OkPacket>(
+            "DELETE FROM similar WHERE product_id = ? OR product_similar_id = ?",
+            [req.params.id, req.params.id]
         );
 
         await connection.query<OkPacket>(

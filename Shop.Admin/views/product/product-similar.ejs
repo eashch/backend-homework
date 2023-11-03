@@ -1,0 +1,21 @@
+<div class="product-similar">
+    <h2><%= product.title %></h2>
+    <h3><%= product.price %></h3>
+
+    <div class="remove-mark">
+        <% if(isSimilar){ %>
+            <label for="<%= product.id %>">Mark to remove</label>
+            <input type="checkbox"
+                id="<%= product.id %>"
+                value="<%= product.id %>"
+                name="similarToRemove">
+          <% } else{ %>  
+            <label for="<%= product.id %>">Mark to add</label>
+            <input type="checkbox"
+                id="<%= product.id %>"
+                value="<%= product.id %>"
+                name="similarToAdd">
+         <% } %>
+        
+    </div>
+</div>

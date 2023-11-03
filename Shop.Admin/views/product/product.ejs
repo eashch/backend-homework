@@ -1,4 +1,7 @@
 <h1><%= item.title %></h1>
+<a class="title new-product-ref" href="<%= `new-product` %>">
+    Add product
+</a>
 <form action="<%= `save/${item.id}` %>" method="post" class="product-edit-form">
     <div class="product-edit-fields">
         <div class="field">
@@ -48,6 +51,24 @@
         <div class="product-edit-images">
             <% item.images.forEach(function(image) { %>
                 <%- include('product-image', { image: image }) %>
+            <% }); %>
+        </div>
+    <% } %>
+
+    <% if (similarProducts?.length) { %>
+        <h2>Similar</h2>
+        <div class="product-similar-items">
+            <% similarProducts.forEach(function(similar) { %>
+                <%- include('product-similar', { product: similar, isSimilar: true }) %>
+            <% }); %>
+        </div>
+    <% } %>
+
+    <% if (notSimilarProducts?.length) { %>
+        <h2>Other products</h2>
+        <div class="product-similar-items">
+            <% notSimilarProducts.forEach(function(notSimilar) { %>
+                <%- include('product-similar', { product: notSimilar, isSimilar: false }) %>
             <% }); %>
         </div>
     <% } %>

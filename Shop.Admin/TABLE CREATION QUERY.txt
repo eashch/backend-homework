@@ -1,0 +1,9 @@
+CREATE TABLE
+        similar(
+            similar_id VARCHAR(36) NOT NULL,
+            product_id VARCHAR(36) NOT NULL,
+            product_similar_id VARCHAR(36) NOT NULL,
+            PRIMARY KEY (similar_id),
+            FOREIGN KEY (product_id) REFERENCES products(product_id),
+            FOREIGN KEY (product_similar_id) REFERENCES products(product_id)
+        );

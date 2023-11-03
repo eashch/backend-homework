@@ -1,6 +1,6 @@
 import axios from "axios";
 import { IProduct, IProductFilterPayload } from "@Shared/types";
-import { IProductEditData } from "../types";
+import { IProductEditData, IProductNewData, SimilarAddPairsPayload } from "../types";
 import { API_HOST } from "./const";
 
 export async function getProducts(): Promise<IProduct[]> {
@@ -29,7 +29,7 @@ export async function getProduct(
     } catch (e) {
         return null;
     }
-    }
+}
 
 export async function removeProduct(id: string): Promise<void> {
     await axios.delete(`${API_HOST}/products/${id}`);
@@ -45,6 +45,24 @@ function splitNewImages(str = ""): string[] {
 function compileIdsToRemove(data: string | string[]): string[] {
     if (typeof data === "string") return [data];
     return data;
+}
+
+function compileSimilarPairsToAdd(currentProductID: string, 
+        data: string | string[]): SimilarAddPairsPayload {
+    
+    if (typeof data === "string") 
+        data = [data];
+
+    const addPairs: SimilarAddPairsPayload = {
+        pairs: []
+    };
+    data.forEach((item) => {
+        addPairs.pairs.push({
+            product_id: currentProductID,
+            product_similar_id: item
+        });
+    });
+    return addPairs;
 }
 
 export async function updateProduct(
@@ -87,6 +105,18 @@ export async function updateProduct(
             });
         }
 
+        if (formData.similarToAdd) {
+            const similarToAdd = compileSimilarPairsToAdd(
+                currentProduct.id, formData.similarToAdd);
+            await axios.post(`${API_HOST}/similar/add-similar`, 
+                similarToAdd);
+        }
+
+        if (formData.similarToRemove) {
+            const similarIdsToRemove = compileIdsToRemove(formData.similarToRemove);
+            await axios.post(`${API_HOST}/similar/remove-similar`, similarIdsToRemove);
+        }
+
         await axios.patch(`${API_HOST}/products/${productId}`, {
             title: formData.title,
             description: formData.description,
@@ -97,3 +127,38 @@ export async function updateProduct(
     }
 }
 
+
+export async function createProduct(
+    formData: IProductNewData,
+    onResponse: (id: string) => void
+): Promise<void> {
+    try {
+        await axios.post(`${API_HOST}/products/`, {
+            title: formData.title,
+            description: formData.description,
+            price: formData.price,
+        }).then(function (response) {
+            onResponse(response.data["id"]);
+        }).catch(function (error) {
+            console.log(error);
+        });
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+export async function getSimilarForProduct(
+    id: string
+): Promise<string[] | null> {
+    try {
+        const { data } = await axios.get<string[]>(
+            `${API_HOST}/similar/${id}`
+        );
+        if (!data || !data.length) 
+            return null;
+
+        return data;
+    } catch (e) {
+        return null;
+    }
+}

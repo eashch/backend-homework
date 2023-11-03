@@ -12,6 +12,7 @@ function ProductsPage() {
             return (
                 <ProductOnProductsPage
                     product={product}
+                    key={product.id}
                 />
             );
         });

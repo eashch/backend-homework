@@ -26,10 +26,27 @@ export const INSERT_PRODUCT_IMAGES_QUERY = `
     VALUES ?
 `;
 
+export const INSERT_SIMILAR_PAIRS_QUERY = `
+    INSERT INTO similar
+    (similar_id, product_id, product_similar_id)
+    VALUES ?
+`;
+
 export const DELETE_IMAGES_QUERY = `
     DELETE FROM images 
     WHERE image_id IN ?;
 `;
+
+export const DELETE_SIMILARS_QUERY = `
+    DELETE FROM similar 
+    WHERE product_id IN ?;
+`;
+
+export const DELETE_SIMILARS_SECOND_ID_QUERY = `
+    DELETE FROM similar 
+    WHERE product_similar_id IN ?;
+`;
+
 
 export const REPLACE_PRODUCT_THUMBNAIL = `
     UPDATE images

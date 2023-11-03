@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
-import { getProduct, getProducts, removeProduct, searchProducts, updateProduct } from "../models/products.model";
-import { IProductFilterPayload } from "@Shared/types";
-import { IProductEditData } from "../types";
+import { createProduct, getProduct, getProducts, getSimilarForProduct, removeProduct, searchProducts, updateProduct } from "../models/products.model";
+import { IProduct, IProductFilterPayload } from "@Shared/types";
+import { IProductEditData, IProductNewData } from "../types";
 import { throwServerError } from "./helper";
 
 export const productsRouter = Router();
@@ -18,7 +18,17 @@ productsRouter.get('/', async (req: Request, res: Response) => {
     }
 });
 
-    productsRouter.get('/search', async (
+productsRouter.get('/new-product', async (req: Request, res: Response) => {
+    try {
+        res.render("new-product", {
+            queryParams: {}
+        });
+    } catch (e) {
+        throwServerError(res, e);
+    }
+});
+
+productsRouter.get('/search', async (
     req: Request<{}, {}, {}, IProductFilterPayload>,
     res: Response
     ) => {
@@ -39,15 +49,31 @@ productsRouter.get('/:id', async (
 ) => {
     try {
         const product = await getProduct(req.params.id);
+        const similarProducts = await getSimilarForProduct(
+            req.params.id);
+        const allProducts = await getProducts();
+
+        const similarItems: IProduct[] = [];
+        const notSimilarItems: IProduct[] = [];
+
+        allProducts.forEach(item => {
+            if (similarProducts && similarProducts.includes(item.id)) {
+                similarItems.push(item);
+            } else if (item.id !== req.params.id) {
+                notSimilarItems.push(item);
+            }
+        });
 
         if (product) {
-        res.render("product/product", {
-            item: product
-        });
+            res.render("product/product", {
+                item: product,
+                similarProducts: similarItems,
+                notSimilarProducts: notSimilarItems
+            });
         } else {
-        res.render("product/empty-product", {
-            id: req.params.id
-        });
+            res.render("product/empty-product", {
+                id: req.params.id
+            });
         }
     } catch (e) {
         throwServerError(res, e);
@@ -79,6 +105,20 @@ productsRouter.post('/save/:id', async (
     try {
         await updateProduct(req.params.id, req.body);
         res.redirect(`/${process.env.ADMIN_PATH}/${req.params.id}`);
+    } catch (e) {
+        throwServerError(res, e);
+    }
+});
+
+
+productsRouter.post('/new-product', async (
+    req: Request<{}, {}, IProductNewData>,
+    res: Response
+) => {
+    try {
+        await createProduct(req.body, (id: string) => {
+            res.redirect(`/${process.env.ADMIN_PATH}/${id}`);
+        });
     } catch (e) {
         throwServerError(res, e);
     }

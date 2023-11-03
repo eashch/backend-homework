@@ -37,3 +37,9 @@ export enum ELoadingStatus {
     LOADED,
     ERROR
 };
+
+export interface ISimilarEntity {
+    similar_id: string;
+    product_id: string;
+    product_similar_id: string;
+}

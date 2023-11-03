@@ -1,10 +1,9 @@
-import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import './Layout.css';
 
 const Layout = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    console.log(location.pathname);
 
     return (
         <div className="layout">

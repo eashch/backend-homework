@@ -39,3 +39,17 @@ export type ImagesRemovePayload = string[];
 export interface IUserRequisitesEntity extends IAuthRequisites, RowDataPacket {
     id: number;
 }
+
+export interface ISimilarEntity extends RowDataPacket {
+    similar_id: string;
+    product_id: string;
+    product_similar_id: string;
+}
+
+export type SimilarCreatePayload = Omit<ISimilarEntity, "similar_id">;
+
+export interface SimilarAddPairsPayload {
+    pairs: SimilarCreatePayload[];
+}
+
+export type SimilarRemovePayload = string[];
