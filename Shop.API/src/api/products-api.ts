@@ -125,7 +125,6 @@ productsRouter.post('/', async (
     res: Response
 ) => {
     try {
-        console.log("NEW PRODUCT?: " + JSON.stringify(req.body));
         const { title, description, price, images } = req.body;
         const productId = uuidv4();
         await connection.query<OkPacket>(
@@ -134,7 +133,6 @@ productsRouter.post('/', async (
         );
 
         if (images) {
-            console.log("ENTER?");
             const values = images.map((image) => [uuidv4(), image.url, productId, image.main]);
             await connection.query<OkPacket>(INSERT_PRODUCT_IMAGES_QUERY, [values]);
         }

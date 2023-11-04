@@ -51,7 +51,6 @@ similarProductsRouter.get('/:id',
                 setOfIDs.add(item.product_similar_id);
         });
         const arrayOfIDs = Array.from(setOfIDs);
-        console.log("SOME?: " + JSON.stringify(arrayOfIDs));
 
         res.setHeader('Content-Type', 'application/json');
         res.send(arrayOfIDs);

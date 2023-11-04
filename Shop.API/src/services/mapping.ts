@@ -43,18 +43,3 @@ export const mapImageEntity = ({
 export const mapImagesEntity = (data: IProductImageEntity[]): IProductImage[] => {
     return data.map(mapImageEntity);
 }
-    
-
-// export const mapSimilarProductEntity = ({
-//     comment_id, product_id, ...rest
-// }: ISimilarEntity): IComment => {
-//     return {
-//         id: comment_id,
-//         productId: product_id,
-//         ...rest
-//     }
-// }
-
-// export const mapSimilarProductsEntity = (data: ICommentEntity[]): IComment[] => {
-//     return data.map(mapCommentEntity);
-// }

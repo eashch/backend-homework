@@ -24,20 +24,11 @@ function initRouter() {
     const shopAdmin = ShopAdmin();
     server.use("/admin", shopAdmin);
 
-
-
-    // serve up production assets
     server.use(express.static('shop-client/build'));
-    // let the react app to handle any unknown routes 
-    // serve up the index.html if express does'nt recognize the route
     const path = require('path');
     server.get('*', (req, res) => {
         res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
     });
-
-    // server.use("/", (_, res) => {
-    //     res.send("React App");
-    // });
 }
 
 launchApplication();
